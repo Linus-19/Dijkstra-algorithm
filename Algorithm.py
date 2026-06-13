@@ -8,7 +8,7 @@ import heapq
 data = "Data_intersections_QuebecCity.csv"
 links = "links_quebec.csv"
 x, y, streets = ID.Import(data) #Import intersection data
-data_sheet = pd.read_csv(links)
+#data_sheet = pd.read_csv(links)
 
 grid = G.Grid([100, 100])
 
@@ -16,8 +16,8 @@ for coords in range(len(x)) :
     #Creating the nodes corresponding to the intersection using longitude and latitude
     grid.AddNode(x[coords], y [coords]) 
 
-for i in range (data_sheet.shape[0]) :
-    grid.AddLink(data_sheet.iat[i, 0],data_sheet.iat[i, 1])
+#for i in range (data_sheet.shape[0]) :
+    #grid.AddLink(data_sheet.iat[i, 0],data_sheet.iat[i, 1])
 
 
 for coords in range(len(x)) : 
@@ -52,34 +52,6 @@ for coords in range(len(x)) :
         grid.AddLink(coords, distances.index(valid_link))
     
 
-
-
-
-
-grid.AddNode(11, 12)
-grid.AddNode(76, 13)
-grid.AddLink(0, 1)
-grid.AddNode(30, 33)
-grid.AddLink(0, 2)
-grid.AddNode(14, 63)
-grid.AddNode(41, 81)
-grid.AddLink(3,4)
-grid.AddNode(85, 57)
-grid.AddLink(4,5)
-grid.AddNode(58, 50)
-grid.AddLink(4, 6)
-grid.AddNode(65, 32)
-grid.AddLink(1, 7)
-grid.AddLink(2, 7)
-grid.AddLink(5,7)
-grid.AddLink(6, 7)
-grid.AddNode(11, 42)
-grid.AddLink(2, 8)
-grid.AddLink(3, 8)
-grid.AddLink(6, 8)
-grid.AddNode(75, 96)
-grid.AddLink(5, 9)
-grid.AddLink(4, 9)
 
 
 
