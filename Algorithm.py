@@ -3,7 +3,6 @@ import pandas as pd
 
 import Import_Data as ID
 import math
-import heapq
 
 data = "Data_intersections_QuebecCity.csv"
 links = "links_quebec.csv"
@@ -19,38 +18,50 @@ for coords in range(len(x)) :
 #for i in range (data_sheet.shape[0]) :
     #grid.AddLink(data_sheet.iat[i, 0],data_sheet.iat[i, 1])
 
+streets_tuple = [tuple(s) for s in streets]
+street_to_indices = {}
+for i, s in enumerate(streets_tuple):
+    street_to_indices[s] = i
 
 for coords in range(len(x)) : 
-    for street in streets[coords] :
         #Getting every intersection matching the current street
-        intersections_of_street = [sublist for sublist in streets if street in sublist] 
+    intersections_of_street = []
+    for street in streets[coords]:
+        for i, s in enumerate(streets):
+            if street in s and i != coords:
+                intersections_of_street.append(i)
+    intersections_of_street = list(set(intersections_of_street)) 
     distances = []
-    for intersection in intersections_of_street :
-        #Getting the distance to those intersenction
-        distance = math.sqrt((x[coords] - x[streets.index(intersection)])**2 + (y[coords] - y[streets.index(intersection)])**2 ) #Getting the distance to those intersenction
-        if distance == 0 : 
-            distances.append(None)
-        else:
-            distances.append(distance)
+    for idx in intersections_of_street:
+        d = math.sqrt((x[coords] - x[idx])**2 + (y[coords] - y[idx])**2)
+        if d > 0:
+            distances.append((d, idx))
+
+    if not distances:
+        continue
     #Getting the two closest intersection to the current one, those are the most likely to be linked
-    valid_links = heapq.nsmallest(2, heapq.nsmallest(2, (x for x in distances if x is not None)))
+    distances.sort()
+    closest = distances[:2] 
     #Making sure the current intersection is not a dead end, if both intersection a situated in the same direction, only link to one of them
     
-    if len(valid_links) > 1 :
-        if abs(grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[0])])] [0] - grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[1])])] [0]) < grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[0])])] [0] and abs(grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[0])])] [1] - grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[1])])] [1]) < grid.nodes[streets.index(intersections_of_street[distances.index(valid_links[0])])] [1] : 
-        
-            valid_link = min(valid_links)
-            grid.AddLink(coords, distances.index(valid_link))
-        else : 
-            
-            grid.AddLink(coords, distances.index(valid_links[0]))
-            grid.AddLink(coords, distances.index(valid_links[1]))
+    if len(closest) == 2:
+        d1, idx1 = closest[0]
+        d2, idx2 = closest[1]
 
-        
-    elif len(valid_links) > 0 :
-        valid_link = valid_links[0]
-        grid.AddLink(coords, distances.index(valid_link))
-    
+        v1 = (x[idx1] - x[coords], y[idx1] - y[coords])
+        v2 = (x[idx2] - x[coords], y[idx2] - y[coords])
+
+        dot = v1[0]*v2[0] + v1[1]*v2[1]
+        mag = math.sqrt(v1[0]**2 + v1[1]**2) * math.sqrt(v2[0]**2 + v2[1]**2)
+        cosine = dot / mag if mag > 0 else 0
+
+        if cosine > 0.7:
+            grid.AddLink(coords, idx1)  # seulement le plus proche
+        else:
+            grid.AddLink(coords, idx1)
+            grid.AddLink(coords, idx2)
+    elif len(closest) == 1:
+        grid.AddLink(coords, closest[0][1])
 
 
 
@@ -97,11 +108,11 @@ def GetPath() :
 
         
 
-SerchGrid()
-
+#SerchGrid()
+#print(grid.nodes[end_index] [4])
 #for node in grid.nodes :
     #print(f"Node : {grid.nodes.index(node)}, weight : {node[2]}")
 
-grid.Visualise(GetPath(), starting_node, end_node)
+#grid.Visualise(GetPath(), starting_node, end_node)
 
-#grid.VisualizeGrid()
+grid.VisualizeGrid()

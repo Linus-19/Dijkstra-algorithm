@@ -58,5 +58,7 @@ class Grid :
             x_list.append(node[0])
             y_list.append([node[1]])
         plt.scatter(x_list,y_list)
+        for link in self.links :
+            plt.plot([self.nodes[link[0]] [0], self.nodes[link[1]] [0]], [self.nodes[link[0]] [1], self.nodes[link[1]] [1]], 'o:k', ms =4)
         plt.show()
 
